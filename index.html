@@ -565,6 +565,61 @@
       margin-top: 10px;
     }
 
+
+    .project-open {
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .project-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .note-btn {
+      flex: 1;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #eef4ff;
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .note-btn:hover {
+      border-color: #c7d5ea;
+    }
+
+    .project-note {
+      margin: 10px 0 0;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+    }
+
+    .modal textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
+      margin-bottom: 12px;
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    .note-project-name {
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px !important;
+    }
+
 </style>
 </head>
 <body>
@@ -585,23 +640,33 @@
         <p>一些我正在做的、或已经完成的小作品。</p>
       </div>
             <!-- PROJECTS_START -->
-        <article class="card project">
-          <div class="project-top">
-            <div class="project-icon">📄</div>
-            <span class="tag">项目</span>
-          </div>
-          <h3>测试文件001.txt</h3>
-          <p>点击下方链接打开文件。</p>
-          <a href="projects/%E6%B5%8B%E8%AF%95%E6%96%87%E4%BB%B6001.txt" target="_blank" rel="noopener">打开 →</a>
-        </article>
-        <article class="card project">
+        <article class="card project" data-file="屏幕截图 2026-09-08 225118.png">
           <div class="project-top">
             <div class="project-icon">🖼️</div>
             <span class="tag">项目</span>
           </div>
           <h3>屏幕截图 2026-09-08 225118.png</h3>
-          <p>点击下方链接打开文件。</p>
-          <a href="projects/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-09-08%20225118.png" target="_blank" rel="noopener">打开 →</a>
+          <p>点击下方按钮打开项目。</p>
+          <p class="project-note" hidden></p>
+          <a class="btn btn-primary project-open" href="projects/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-09-08%20225118.png" target="_blank" rel="noopener">打开项目 →</a>
+          <div class="project-actions">
+            <button type="button" class="note-btn">编辑注释</button>
+            <button type="button" class="delete-btn">删除</button>
+          </div>
+        </article>
+        <article class="card project" data-file="测试文件001.txt">
+          <div class="project-top">
+            <div class="project-icon">📄</div>
+            <span class="tag">项目</span>
+          </div>
+          <h3>测试文件001.txt</h3>
+          <p>点击下方按钮打开项目。</p>
+          <p class="project-note" hidden></p>
+          <a class="btn btn-primary project-open" href="projects/%E6%B5%8B%E8%AF%95%E6%96%87%E4%BB%B6001.txt" target="_blank" rel="noopener">打开项目 →</a>
+          <div class="project-actions">
+            <button type="button" class="note-btn">编辑注释</button>
+            <button type="button" class="delete-btn">删除</button>
+          </div>
         </article>
       <!-- PROJECTS_END -->
 
@@ -620,6 +685,7 @@
 
 
 
+
   <div id="deleteModal" class="modal-overlay" hidden>
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
       <h2 id="deleteModalTitle">删除项目</h2>
@@ -633,14 +699,29 @@
     </div>
   </div>
 
+  <div id="noteModal" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="noteModalTitle">
+      <h2 id="noteModalTitle">编辑注释</h2>
+      <p id="noteProjectName" class="note-project-name"></p>
+      <textarea id="noteText" rows="4" placeholder="请输入注释内容"></textarea>
+      <input type="password" id="notePassword" placeholder="请输入密码" autocomplete="off" />
+      <p id="noteError" class="delete-error" hidden>密码错误，请重试。</p>
+      <div class="modal-actions">
+        <button type="button" id="cancelNote" class="btn btn-secondary">取消</button>
+        <button type="button" id="saveNote" class="btn btn-danger">修改</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function () {
       var PASSWORD = "03021128";
-      var STORAGE_KEY = "deletedProjects";
+      var DELETED_KEY = "deletedProjects";
+      var NOTES_KEY = "projectNotes";
 
       function getDeleted() {
         try {
-          var raw = localStorage.getItem(STORAGE_KEY);
+          var raw = localStorage.getItem(DELETED_KEY);
           return raw ? JSON.parse(raw) : [];
         } catch (e) {
           return [];
@@ -649,13 +730,44 @@
 
       function saveDeleted(items) {
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+          localStorage.setItem(DELETED_KEY, JSON.stringify(items));
+        } catch (e) {}
+      }
+
+      function getNotes() {
+        try {
+          var raw = localStorage.getItem(NOTES_KEY);
+          return raw ? JSON.parse(raw) : {};
+        } catch (e) {
+          return {};
+        }
+      }
+
+      function saveNotes(notes) {
+        try {
+          localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
         } catch (e) {}
       }
 
       function cardId(card) {
         var heading = card.querySelector("h3");
         return card.getAttribute("data-file") || (heading ? heading.textContent.trim() : "");
+      }
+
+      function renderNotes() {
+        var notes = getNotes();
+        document.querySelectorAll(".card.project").forEach(function (card) {
+          var el = card.querySelector(".project-note");
+          if (!el) return;
+          var value = notes[cardId(card)];
+          if (value) {
+            el.textContent = "注释：" + value;
+            el.hidden = false;
+          } else {
+            el.textContent = "";
+            el.hidden = true;
+          }
+        });
       }
 
       function applyDeleted() {
@@ -667,69 +779,144 @@
         });
       }
 
-      function attachDeleteButtons() {
-        document.querySelectorAll(".card.project").forEach(function (card) {
-          if (card.querySelector(".delete-btn")) return;
-          var button = document.createElement("button");
-          button.type = "button";
-          button.className = "delete-btn";
-          button.textContent = "删除";
-          button.setAttribute("aria-label", "删除项目");
-          button.addEventListener("click", function () {
-            pendingCard = card;
-            passwordInput.value = "";
-            errorMsg.hidden = true;
-            modal.hidden = false;
-            passwordInput.focus();
-          });
-          card.querySelector(".project-top").appendChild(button);
-        });
+      var deleteModal = document.getElementById("deleteModal");
+      var deletePasswordInput = document.getElementById("deletePassword");
+      var deleteError = document.getElementById("deleteError");
+      var cancelDeleteBtn = document.getElementById("cancelDelete");
+      var confirmDeleteBtn = document.getElementById("confirmDelete");
+
+      var noteModal = document.getElementById("noteModal");
+      var noteText = document.getElementById("noteText");
+      var notePasswordInput = document.getElementById("notePassword");
+      var noteError = document.getElementById("noteError");
+      var noteProjectName = document.getElementById("noteProjectName");
+      var cancelNoteBtn = document.getElementById("cancelNote");
+      var saveNoteBtn = document.getElementById("saveNote");
+
+      var pendingDeleteCard = null;
+      var pendingNoteCard = null;
+
+      function openDelete(card) {
+        pendingDeleteCard = card;
+        deletePasswordInput.value = "";
+        deleteError.hidden = true;
+        deleteModal.hidden = false;
+        deletePasswordInput.focus();
       }
 
-      var modal = document.getElementById("deleteModal");
-      var passwordInput = document.getElementById("deletePassword");
-      var errorMsg = document.getElementById("deleteError");
-      var cancelBtn = document.getElementById("cancelDelete");
-      var confirmBtn = document.getElementById("confirmDelete");
-      var pendingCard = null;
+      function openNote(card) {
+        pendingNoteCard = card;
+        noteProjectName.textContent = cardId(card);
+        var notes = getNotes();
+        noteText.value = notes[cardId(card)] || "";
+        notePasswordInput.value = "";
+        noteError.hidden = true;
+        noteModal.hidden = false;
+        noteText.focus();
+      }
 
-      cancelBtn.addEventListener("click", function () {
-        modal.hidden = true;
-        pendingCard = null;
-      });
-
-      modal.addEventListener("click", function (event) {
-        if (event.target === modal) {
-          modal.hidden = true;
-          pendingCard = null;
-        }
-      });
-
-      confirmBtn.addEventListener("click", function () {
-        if (passwordInput.value !== PASSWORD) {
-          errorMsg.hidden = false;
-          passwordInput.focus();
-          passwordInput.select();
+      document.addEventListener("click", function (event) {
+        var deleteButton = event.target.closest(".delete-btn");
+        if (deleteButton) {
+          var card = deleteButton.closest(".card.project");
+          if (card) openDelete(card);
           return;
         }
-        if (pendingCard) {
-          var id = cardId(pendingCard);
+
+        var noteButton = event.target.closest(".note-btn");
+        if (noteButton) {
+          var noteCard = noteButton.closest(".card.project");
+          if (noteCard) openNote(noteCard);
+        }
+      });
+
+      cancelDeleteBtn.addEventListener("click", function () {
+        deleteModal.hidden = true;
+        pendingDeleteCard = null;
+      });
+
+      deleteModal.addEventListener("click", function (event) {
+        if (event.target === deleteModal) {
+          deleteModal.hidden = true;
+          pendingDeleteCard = null;
+        }
+      });
+
+      confirmDeleteBtn.addEventListener("click", function () {
+        if (deletePasswordInput.value !== PASSWORD) {
+          deleteError.hidden = false;
+          deletePasswordInput.focus();
+          deletePasswordInput.select();
+          return;
+        }
+        if (pendingDeleteCard) {
+          var id = cardId(pendingDeleteCard);
           var deleted = getDeleted();
           if (deleted.indexOf(id) === -1) deleted.push(id);
           saveDeleted(deleted);
-          pendingCard.remove();
+          pendingDeleteCard.remove();
         }
-        modal.hidden = true;
-        pendingCard = null;
+        deleteModal.hidden = true;
+        pendingDeleteCard = null;
       });
 
-      passwordInput.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") confirmBtn.click();
+      deletePasswordInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") confirmDeleteBtn.click();
       });
 
-      attachDeleteButtons();
+      cancelNoteBtn.addEventListener("click", function () {
+        noteModal.hidden = true;
+        pendingNoteCard = null;
+      });
+
+      noteModal.addEventListener("click", function (event) {
+        if (event.target === noteModal) {
+          noteModal.hidden = true;
+          pendingNoteCard = null;
+        }
+      });
+
+      saveNoteBtn.addEventListener("click", function () {
+        if (notePasswordInput.value !== PASSWORD) {
+          noteError.hidden = false;
+          notePasswordInput.focus();
+          notePasswordInput.select();
+          return;
+        }
+        if (pendingNoteCard) {
+          var id = cardId(pendingNoteCard);
+          var notes = getNotes();
+          var value = noteText.value.trim();
+          if (value) {
+            notes[id] = value;
+          } else {
+            delete notes[id];
+          }
+          saveNotes(notes);
+
+          var el = pendingNoteCard.querySelector(".project-note");
+          if (el) {
+            if (value) {
+              el.textContent = "注释：" + value;
+              el.hidden = false;
+            } else {
+              el.textContent = "";
+              el.hidden = true;
+            }
+          }
+        }
+        noteModal.hidden = true;
+        pendingNoteCard = null;
+      });
+
+      notePasswordInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") saveNoteBtn.click();
+      });
+
       applyDeleted();
+      renderNotes();
     })();
   </script>
+
 </body>
 </html>

@@ -56,14 +56,19 @@ if ($remaining.Count -eq 0) {
         elseif ($ext -in @(".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp")) { $icon = "🖼️" }
 
         $cards += @"
-        <article class="card project">
+        <article class="card project" data-file="$displayName">
           <div class="project-top">
             <div class="project-icon">$icon</div>
             <span class="tag">项目</span>
           </div>
           <h3>$displayName</h3>
-          <p>点击下方链接打开文件。</p>
-          <a href="projects/$encodedName" target="_blank" rel="noopener">打开 →</a>
+          <p>点击下方按钮打开项目。</p>
+          <p class="project-note" hidden></p>
+          <a class="btn btn-primary project-open" href="projects/$encodedName" target="_blank" rel="noopener">打开项目 →</a>
+          <div class="project-actions">
+            <button type="button" class="note-btn">编辑注释</button>
+            <button type="button" class="delete-btn">删除</button>
+          </div>
         </article>
 "@
     }
