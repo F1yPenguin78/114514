@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
@@ -434,6 +434,20 @@
       color: #ef4444;
     }
 
+    .contact-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .contact-list .btn {
+      position: relative;
+      z-index: 1;
+    }
+
     @media (max-width: 840px) {
       .hero {
         grid-template-columns: 1fr;
@@ -473,70 +487,16 @@
     <div class="container nav">
       <a href="#" class="brand">Flypenguin78</a>
       <nav class="nav-links" aria-label="主导航">
-        <a href="#about">关于</a>
         <a href="#projects">项目</a>
-        <a href="#contact" class="btn btn-primary">联系我</a>
+        <a href="#contact" class="btn btn-primary">联系方式</a>
       </nav>
     </div>
   </header>
 
   <main>
-    <section class="container hero">
-      <div>
-        <span class="eyebrow">网站已上线 · 欢迎光临</span>
-        <h1>你好，我是<br /><span class="gradient-text">Flypenguin78</span></h1>
-        <p class="lead">
-          一个热爱编程、创造与分享的开发者。这里是我的个人小站，记录项目、想法和成长足迹。
-        </p>
-        <div class="actions">
-          <a href="#projects" class="btn btn-primary">查看项目</a>
-          <a href="https://github.com/Flypenguin78" target="_blank" rel="noopener" class="btn btn-secondary">GitHub</a>
-        </div>
-      </div>
-
-      <div class="hero-art" aria-hidden="true">
-        <div class="deco deco-one"></div>
-        <div class="deco deco-two"></div>
-        <div class="card avatar-card">
-          <div class="avatar">🐧</div>
-          <h2>Flypenguin78</h2>
-          <p>Developer · Creator</p>
-          <div class="badges">
-            <span class="badge">GitHub</span>
-            <span class="badge">开源</span>
-            <span class="badge">持续学习</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="about" class="container">
+    <section id="projects" class="container" style="padding-top: 72px;">
       <div class="section-head">
-        <h2>关于我</h2>
-        <p>用代码解决问题，用好奇心探索世界。</p>
-      </div>
-      <div class="grid three">
-        <article class="card feature">
-          <div class="feature-icon">💻</div>
-          <h3>编程开发</h3>
-          <p>喜欢构建小而美的工具，也乐于参与开源项目，让想法变成可运行的产品。</p>
-        </article>
-        <article class="card feature">
-          <div class="feature-icon">🧩</div>
-          <h3>解决问题</h3>
-          <p>享受拆解复杂问题的过程，从需求出发找到简单、可靠的解决方案。</p>
-        </article>
-        <article class="card feature">
-          <div class="feature-icon">📚</div>
-          <h3>持续学习</h3>
-          <p>保持好奇心和输出习惯，用博客和项目记录每一次新的尝试与收获。</p>
-        </article>
-      </div>
-    </section>
-
-    <section id="projects" class="container">
-      <div class="section-head">
-        <h2>精选项目</h2>
+        <h2>个人项目</h2>
         <p>一些我正在做的、或已经完成的小作品。</p>
       </div>
       <div class="grid projects">
@@ -563,19 +523,17 @@
 
     <section id="contact" class="container">
       <div class="contact">
-        <h2>一起做点有趣的事</h2>
-        <p>有想法、建议或合作机会？欢迎通过 GitHub 找到我。</p>
-        <a href="https://github.com/Flypenguin78" target="_blank" rel="noopener" class="btn btn-primary">访问我的 GitHub</a>
+        <h2>联系方式</h2>
+        <p>欢迎通过以下方式联系我。</p>
+        <div class="contact-list">
+          <a class="btn btn-primary" href="mailto:2500011078@stu.pku.edu.cn">📧 邮箱：2500011078@stu.pku.edu.cn</a>
+          <a class="btn btn-secondary" href="https://wpa.qq.com/msgrd?v=3&amp;uin=3490742108&amp;site=qq&amp;menu=yes" target="_blank" rel="noopener">💬 QQ：3490742108</a>
+        </div>
       </div>
     </section>
   </main>
 
-  <footer class="container">
-    <p>© <span id="year"></span> Flypenguin78 · 用 <span class="heart">♥</span> 构建于 GitHub Pages</p>
-  </footer>
 
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
+
 </body>
 </html>
